@@ -1,42 +1,19 @@
 name: Daily Threads Trend Summary
-
 on:
   schedule:
-      # 매일 09:00 UTC (한국 시간 18:00 = KST+9)에 실행
-          - cron: '0 9 * * *'
-
-              # 수동 트리거도 가능 (Actions 탭에서 실행 가능)
-                workflow_dispatch:
-
-                jobs:
-                  scrape-and-analyze:
-                      runs-on: ubuntu-latest
-
-                              steps:
-                                    - name: 저장소 체크아웃
-                                            uses: actions/checkout@v4
-
-                                                        - name: Python 설정
-                                                                uses: actions/setup-python@v4
-                                                                        with:
-                                                                                  python-version: '3.11'
-
-                                                                                              - name: 의존성 설치
-                                                                                                      run: |
-                                                                                                                pip install --upgrade pip
-                                                                                                                          pip install -r requirements.txt
-                                                                                                                                
-                                                                                                                                      - name: Playwright 브라우저 설치
-                                                                                                                                              run: |
-                                                                                                                                                        playwright install chromium
-                                                                                                                                                              
-                                                                                                                                                                    - name: 트렌드 분석 및 Slack 전송
-                                                                                                                                                                            env:
-                                                                                                                                                                                      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-                                                                                                                                                                                                SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-                                                                                                                                                                                                        run: |
-                                                                                                                                                                                                                  python trends.py
-                                                                                                                                                                                                                        
-                                                                                                                                                                                                                              - name: 실행 결과 로그
-                                                                                                                                                                                                                                      if: always()
-                                                                                                                                                                                                                                              run: echo "✅ 트렌드 분석 완료"
+      - cron: '0 9 * * *'
+        workflow_dispatch:
+        jobs:
+          scrape-and-analyze:
+              runs-on: ubuntu-latest
+                  steps:
+                        - uses: actions/checkout@v4
+                              - uses: actions/setup-python@v4
+                                      with:
+                                                python-version: '3.11'
+                                                      - run: pip install -r requirements.txt
+                                                            - run: playwright install chromium
+                                                                  - run: python trends.py
+                                                                          env:
+                                                                                    GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+                                                                                              SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
